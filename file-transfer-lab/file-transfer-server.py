@@ -30,7 +30,7 @@ s.listen(1)              # allow only one outstanding request
 conn, addr = s.accept()  # wait until incoming connection request (and accept it)
 print('Connected by', addr)
 
-with open('send-test-short', 'r') as f:
+with open('send-test-long', 'r') as f:
     file = f.read()
 
 sendAll(conn, file.encode())

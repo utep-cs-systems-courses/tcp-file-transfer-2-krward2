@@ -5,3 +5,5 @@ def sendAll(sock, buf):
         print(f" {nbytes} bytes sent, {len(buf) - nbytes} bytes remain")
         buf = buf[nbytes:]
 
+#def recvAll(sock):
+#    while 1:
