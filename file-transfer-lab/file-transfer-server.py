@@ -2,7 +2,7 @@
 
 # Echo server program
 
-import socket, sys, re
+import socket, sys, re, os
 from framedSock import framedReceive
 
 sys.path.append("../lib")       # for params
@@ -10,7 +10,8 @@ import params
 
 switchesVarDefaults = (
     (('-l', '--listenPort') ,'listenPort', 50001),
-    (('-?', '--usage'), "usage", False), # boolean (set if present)
+    (('-?', '--usage'), "usage", False),
+    (('-d', '--debug'), 'debug', 0) # boolean (set if present)
     )
 
 progname = "echoserver"
@@ -18,6 +19,7 @@ paramMap = params.parseParams(switchesVarDefaults)
 
 listenPort = paramMap['listenPort']
 listenAddr = ''       # Symbolic name meaning all available interfaces
+debug = paramMap['debug']
 
 if paramMap['usage']:
     params.usage()
@@ -34,16 +36,17 @@ while True:
     # receive files from client connection
     if not os.fork():
         try:
-            fileName, contents = framedReceive(connection, debug)
+            fileName, contents = framedReceive(conn, debug)
         except:
             print("Error: File transfer was not successful!")
-            conn.sendAll(str(0).encode())
+            conn.sendall(str(0).encode())
             sys.exit(1)
-        if not os.path("./files-received"):
+        if not os.path.exists("./files-received"):
             os.makedirs("./files-received")
 
-        with open(filename, 'w+b') as f:
+        fileName = fileName.decode()
+        with open("./files-received/"+fileName, 'w+b') as f:
             file = f.write(contents)
-            file.close()
+
         conn.sendall(str(1).encode())
         sys.exit()
