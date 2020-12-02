@@ -15,6 +15,7 @@ switchesVarDefaults = (
 
 progname = "framedClient"
 paramMap = params.parseParams(switchesVarDefaults)
+server, usage, debug = parameterMap['server'], parameterMap['usage'], parameterMap['debug']
 
 server, usage  = paramMap["server"], paramMap["usage"]
 

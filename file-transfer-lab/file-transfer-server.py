@@ -32,14 +32,18 @@ while True:
     conn, addr = s.accept()  # wait until incoming connection request (and accept it)
     print('Connected by', addr)
     # receive files from client connection
-    try:
-        fileName, contents = framedReceive(connection, debug)
-    except:
-        print("Error: File transfer was not successful!")
-        connection.sendAll(str(0).encode())
-        sys.exit(1)
-    with open('send-test-long', 'r') as f:
-        file = f.read()
+    if not os.fork():
+        try:
+            fileName, contents = framedReceive(connection, debug)
+        except:
+            print("Error: File transfer was not successful!")
+            conn.sendAll(str(0).encode())
+            sys.exit(1)
+        if not os.path("./files-received"):
+            os.makedirs("./files-received")
 
-    sendAll(conn, file.encode())
-    conn.close()
+        with open(filename, 'w+b') as f:
+            file = f.write(contents)
+            file.close()
+        conn.sendall(str(1).encode())
+        sys.exit()
