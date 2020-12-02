@@ -30,7 +30,6 @@ s.listen(16)
 # s is a factory for connected sockets
 
 while True:
-
     conn, addr = s.accept()  # wait until incoming connection request (and accept it)
     print('Connected by', addr)
     # receive files from client connection
