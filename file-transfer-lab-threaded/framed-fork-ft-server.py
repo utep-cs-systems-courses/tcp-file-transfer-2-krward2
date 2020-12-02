@@ -31,6 +31,4 @@ while True:
 
     if not os.fork():
         print("new child process handling connection from", addr)
-        with open('send-test-short', 'r') as f:
-            file = f.read()
-        framedSend(sock, file.encode(), debug)
+        print("received:", framedReceive(sock, debug))

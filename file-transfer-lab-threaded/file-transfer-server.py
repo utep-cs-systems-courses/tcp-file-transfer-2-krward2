@@ -3,7 +3,7 @@
 # Echo server program
 
 import socket, sys, re
-from framedSock import framedReceive
+from sockHelpers import sendAll
 
 sys.path.append("../lib")       # for params
 import params
@@ -24,22 +24,15 @@ if paramMap['usage']:
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((listenAddr, listenPort))
-s.listen(16)
+s.listen(1)              # allow only one outstanding request
 # s is a factory for connected sockets
 
-while True:
+conn, addr = s.accept()  # wait until incoming connection request (and accept it)
+print('Connected by', addr)
 
-    conn, addr = s.accept()  # wait until incoming connection request (and accept it)
-    print('Connected by', addr)
-    # receive files from client connection
-    try:
-        fileName, contents = framedReceive(connection, debug)
-    except:
-        print("Error: File transfer was not successful!")
-        connection.sendAll(str(0).encode())
-        sys.exit(1)
-    with open('send-test-long', 'r') as f:
-        file = f.read()
+with open('send-test-long', 'r') as f:
+    file = f.read()
 
-    sendAll(conn, file.encode())
-    conn.close()
+sendAll(conn, file.encode())
+conn.close()
+
