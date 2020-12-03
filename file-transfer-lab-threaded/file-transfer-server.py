@@ -33,7 +33,8 @@ s.listen(16)
 
 lock = Lock()
 
-def receiveFile(connection):
+def receiveFile(connection, filesInProgress):
+    print("Starting new thread")
     try:
         fileName, contents = framedReceive(conn, debug)
     except:
@@ -45,16 +46,21 @@ def receiveFile(connection):
 
     fileName = fileName.decode()
 
-    lock.acquire()
-    with open("./files-received/"+fileName, 'w+b') as f:
-        file = f.write(contents)
-    lock.release()
+    #Removed uneccessary lock and added check for
+    #already existant file
+    if not os.path.exists(fileName):
+        with open("./files-received/"+fileName, 'w+b') as f:
+            file = f.write(contents)
 
-    conn.sendall(str(1).encode())
-    sys.exit()
+        conn.sendall(str(1).encode())
+        print("File successfully transfered")
+        sys.exit()
+    else:
+        print("File already transferred to server")
 
+fip = list()
 while True:
     conn, addr = s.accept()  # wait until incoming connection request (and accept it)
     print('Connected by', addr)
-    fileReceiveThread = Thread(target=receiveFile, args=(conn,))
+    fileReceiveThread = Thread(target=receiveFile, args=(conn, fip))
     fileReceiveThread.start()

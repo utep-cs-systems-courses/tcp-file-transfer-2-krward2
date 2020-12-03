@@ -41,6 +41,6 @@ def framedReceive(sock, debug=0):
         rbuf += r
         if len(r) == 0:
             if len(rbuf) != 0:
-                print("FramedReceive: incomplete message. \n  state=%s, length=%d, rbuf=%s" % (state, msgLength, rbuf))
+                print("FramedReceive: incomplete message. \n  state=%s, receivedLength=%d, received=%s\n" % (state, msgLength, r))
             return None
-        if debug: print("FramedReceive: state=%s, msglength=%d, bufferLength=%d,  rbuf=%s" % (state, msgLength, len(rbuf), rbuf))
+        if debug: print("FramedReceive: state=%s, msgLength=%d, receivedLength=%d,  received=%s\n" % (state, msgLength, len(r), r))

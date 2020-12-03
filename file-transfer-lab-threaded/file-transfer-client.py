@@ -57,7 +57,7 @@ while True:
             status = int(clientSocket.recv(1).decode())
 
             if status:
-                print("File sent")
+                print("File transfered successfully")
                 sys.exit()
             else:
                 print("File not sent successfully")
