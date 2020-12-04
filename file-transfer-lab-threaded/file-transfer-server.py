@@ -33,7 +33,7 @@ s.listen(16)
 
 lock = Lock()
 filesTransferred = list()
-path = "./files-received"
+path = "./files-received/"
 
 def receiveFile():
     print("Starting new thread")
@@ -52,7 +52,7 @@ def receiveFile():
     #Thread safe existant file check.
     lock.acquire()
     #Checks if file file already transferred
-    if (fileName in filesTransferred) or (os.path.exists("./files-received/"+fileName)):
+    if (fileName in filesTransferred) or (os.path.exists(path+fileName)):
         print("File already transferred to server")
         conn.sendall(str(0).encode()) #Informs client
         lock.release() #Release lock before dying
@@ -60,7 +60,7 @@ def receiveFile():
     else: filesTransferred.append(fileName) #If it's a new file add to list of filesTransferred
     lock.release()
 
-    with open("./files-received/"+fileName, 'w+b') as f:
+    with open(path+fileName, 'w+b') as f:
         f.write(contents)
 
     conn.sendall(str(1).encode())
