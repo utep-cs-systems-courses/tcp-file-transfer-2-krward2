@@ -32,37 +32,43 @@ s.listen(16)
 # s is a factory for connected sockets
 
 lock = Lock()
+filesTransferred = list()
+path = "./files-received"
 
-def receiveFile(connection, l):
+def receiveFile():
     print("Starting new thread")
     try:
         fileName, contents = framedReceive(conn, debug)
     except:
         print("Error: File transfer was not successful!")
+        #Informs the client
         conn.sendall(str(0).encode())
         sys.exit(1)
-    if not os.path.exists("./files-received"):
-        os.makedirs("./files-received")
+    if not os.path.exists(path):
+        os.makedirs(path)
 
     fileName = fileName.decode()
 
-    #Thread safe existant file check
-    l.acquire()
-    if not os.path.exists(fileName):
-        newFile = open("./files-received/"+fileName, 'w+b')
-    else:
+    #Thread safe existant file check.
+    lock.acquire()
+    #Checks if file file already transferred
+    if (fileName in filesTransferred) or (os.path.exists("./files-received/"+fileName)):
         print("File already transferred to server")
+        conn.sendall(str(0).encode()) #Informs client
+        lock.release() #Release lock before dying
         sys.exit()
-    l.release()
+    else: filesTransferred.append(fileName) #If it's a new file add to list of filesTransferred
+    lock.release()
 
-    newFile.write(contents)
+    with open("./files-received/"+fileName, 'w+b') as f:
+        f.write(contents)
+
     conn.sendall(str(1).encode())
-
     print("File successfully transfered")
     sys.exit()
 
 while True:
     conn, addr = s.accept()  # wait until incoming connection request (and accept it)
     print('Connected by', addr)
-    fileReceiveThread = Thread(target=receiveFile, args=(conn,lock))
+    fileReceiveThread = Thread(target=receiveFile, args=())
     fileReceiveThread.start()
