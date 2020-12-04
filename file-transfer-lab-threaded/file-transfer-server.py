@@ -48,20 +48,18 @@ def receiveFile(connection, l):
 
     #Thread safe existant file check
     l.acquire()
-    exists = os.path.exists(fileName)
-    l.release()
-
-    #Writes file if not present
-    if not exists:
-        with open("./files-received/"+fileName, 'w+b') as f:
-            file = f.write(contents)
-
-        conn.sendall(str(1).encode())
-        print("File successfully transfered")
-        sys.exit()
-    #Prints error message if already transferred
+    if not os.path.exists(fileName):
+        newFile = open("./files-received/"+fileName, 'w+b')
     else:
         print("File already transferred to server")
+        sys.exit()
+    l.release()
+
+    newFile.write(contents)
+    conn.sendall(str(1).encode())
+
+    print("File successfully transfered")
+    sys.exit()
 
 while True:
     conn, addr = s.accept()  # wait until incoming connection request (and accept it)
