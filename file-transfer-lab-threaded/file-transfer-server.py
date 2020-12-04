@@ -46,11 +46,12 @@ def receiveFile(connection, l):
 
     fileName = fileName.decode()
 
-    #Removed uneccessary lock and added check for
-    #already existant file.
+    #Thread safe existant file check
     l.acquire()
     exists = os.path.exists(fileName)
     l.release()
+
+    #Writes file if not present
     if not exists:
         with open("./files-received/"+fileName, 'w+b') as f:
             file = f.write(contents)
@@ -58,6 +59,7 @@ def receiveFile(connection, l):
         conn.sendall(str(1).encode())
         print("File successfully transfered")
         sys.exit()
+    #Prints error message if already transferred
     else:
         print("File already transferred to server")
 

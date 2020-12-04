@@ -50,6 +50,7 @@ while True:
             with open("./files/"+fileName, 'r+b') as f:
                 fileContents = f.read()
 
+            #Empty file check
             if len(fileContents) < 1:
                 print("Empty file")
                 continue
