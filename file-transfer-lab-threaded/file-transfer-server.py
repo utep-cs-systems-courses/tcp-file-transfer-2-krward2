@@ -33,7 +33,7 @@ s.listen(16)
 
 lock = Lock()
 
-def receiveFile(connection):
+def receiveFile(connection, l):
     print("Starting new thread")
     try:
         fileName, contents = framedReceive(conn, debug)
@@ -48,7 +48,10 @@ def receiveFile(connection):
 
     #Removed uneccessary lock and added check for
     #already existant file.
-    if not os.path.exists(fileName):
+    l.acquire()
+    exists = os.path.exists(fileName)
+    l.release()
+    if not exists:
         with open("./files-received/"+fileName, 'w+b') as f:
             file = f.write(contents)
 
@@ -61,5 +64,5 @@ def receiveFile(connection):
 while True:
     conn, addr = s.accept()  # wait until incoming connection request (and accept it)
     print('Connected by', addr)
-    fileReceiveThread = Thread(target=receiveFile, args=(conn,))
+    fileReceiveThread = Thread(target=receiveFile, args=(conn,lock))
     fileReceiveThread.start()
